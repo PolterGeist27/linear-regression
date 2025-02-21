@@ -41,8 +41,8 @@ def linearRegression(theta0, theta1, learning_rate, points):
         tmp0 += error # bias
         tmp1 += error * mileage # gradient
 
-    new_theta0 = theta0 - learning_rate * (1/m * tmp0)
-    new_theta1 = theta1 - learning_rate * (1/m * tmp1)
+    new_theta0 = theta0 - learning_rate * (tmp0/m)
+    new_theta1 = theta1 - learning_rate * (tmp1/m)
 
     return (new_theta0, new_theta1)
 
