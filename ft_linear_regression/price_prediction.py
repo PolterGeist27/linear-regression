@@ -28,7 +28,7 @@ def estimatePrice(mileage):
 
 try:
     mileage = float(input("Enter mileage: "))
-    print("Estimaded price: {estimatePrice(mileage)}")
+    print(f"Estimaded price: {estimatePrice(mileage)}")
 except ValueError:
     print("Invalid input, please enter a numerical value.")
 
