@@ -24,7 +24,7 @@ theta0, theta1 = loadModel()
 
 # Calculate the predicted price based on the model's values
 def estimatePrice(mileage):
-    return (theta0 + (theta1 * mileage))
+    return (theta0 + theta1 * mileage)
 
 try:
     mileage = float(input("Enter mileage: "))

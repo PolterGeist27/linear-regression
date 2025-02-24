@@ -18,7 +18,7 @@ y = (y - y_mean) / y_std  # Normalize price
 # Initialize parameters
 theta0 = 0
 theta1 = 0
-learning_rate = 0.01  # Start with 0.01
+learning_rate = 0.001
 iterations = 10000
 m = len(y)
 
