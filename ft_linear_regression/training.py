@@ -1,75 +1,62 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
 
-"""
-Como minimizar o erro:
+# Load data
+data = pd.read_csv("ft_linear_regression/data.csv")
+X = data["km"].values
+y = data["price"].values
 
-    1- Escolher um ponto inicial.
+# Feature scaling (Normalization)
+X_mean, X_std = np.mean(X), np.std(X)
+y_mean, y_std = np.mean(y), np.std(y)
 
-    2- Calcular a derivada da função no ponto para obter o declive. O declive indica a direção de
-        maior subida.
+X = (X - X_mean) / X_std  # Normalize mileage
+y = (y - y_mean) / y_std  # Normalize price
 
-    3- Mover na direção oposta ao declive (a "descer" no gráfico). O tamanho desse passo é determinado
-        pela learning rate do modelo.
+# Initialize parameters
+theta0 = 0
+theta1 = 0
+learning_rate = 0.01  # Start with 0.01
+iterations = 10000
+m = len(y)
 
-    4- Repetir até convergir.
+# Gradient Descent with convergence check
+for i in range(iterations):
+    predictions = theta0 + theta1 * X
+    error = predictions - y
 
-"""
+    # Compute gradients
+    grad_theta0 = (1/m) * np.sum(error)
+    grad_theta1 = (1/m) * np.sum(error * X)
 
-# Function that manually calculates the error of the model
-def calculateError(m, b, points):
-    total_error = 0
-    for i in range(len(points)):
-        x = points.iloc[i].km
-        y = points.iloc[i].price
-        total_error += (y - (m * x + b)) ** 2
-    return total_error / float(len(points))
+    # Update theta
+    theta0 -= learning_rate * grad_theta0
+    theta1 -= learning_rate * grad_theta1
 
+    # Check for NaN or divergence
+    if np.isnan(theta0) or np.isnan(theta1):
+        print(f"❌ Overflow detected at iteration {i}, reducing learning rate...")
+        learning_rate /= 10  # Reduce learning rate
+        theta0, theta1 = 0, 0  # Reset
+        i = 0  # Restart training
 
-def linearRegression(theta0, theta1, learning_rate, points):
-    tmp0 = 0
-    tmp1 = 0
-    m = len(points)
+# Convert theta0 and theta1 back to original scale
+theta1 = theta1 * (y_std / X_std)
+theta0 = (y_mean - theta1 * X_mean)
 
-    for i in range(m):
-        mileage = points.iloc[i].km
-        price = points.iloc[i].price
+# Save model
+with open("model.json", "w") as f:
+    json.dump({"theta0": theta0, "theta1": theta1}, f)
+    
 
-        # Calculate the error between the predicted value and the actual value
-        error = theta0 + (theta1 * mileage) - price
-        tmp0 += error # bias
-        tmp1 += error * mileage # gradient
+print(f"✅ Training complete: theta0 = {theta0}, theta1 = {theta1}")
 
-    new_theta0 = theta0 - learning_rate * (tmp0/m)
-    new_theta1 = theta1 - learning_rate * (tmp1/m)
-
-    return (new_theta0, new_theta1)
-
-
-
-def main():
-    data = pd.read_csv('ft_linear_regression/data.csv')
-
-    # Train the model
-    theta0, theta1 = linearRegression(theta0, theta1, 0.0001, data)
-
-    # Save the computed values to a json file
-    with open("model.json", "w") as file:
-        json.dump({"theta0": theta0, "theta1": theta1}, file)
-
-    # Display the data on a graph
-    plt.scatter(data.km, data.price)
-
-    # Plot the regression line
-    x_values = [min(data.km), max(data.km)]
-    y_values = [theta1 * x + theta0 for x in x_values]
-    plt.plot(x_values, y_values, color="red")
-
-    plt.show()
-
-
-
-if __name__ == "__main__":
-    main()
-
+# Plot Data
+plt.scatter(data["km"], data["price"], color="blue", label="Actual Data")
+plt.plot(data["km"], theta0 + theta1 * data["km"], color="red", label="Regression Line")
+plt.xlabel("Mileage")
+plt.ylabel("Price")
+plt.legend()
+plt.show()
