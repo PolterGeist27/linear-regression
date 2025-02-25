@@ -37,7 +37,7 @@ for i in range(iterations):
 
     # Check for NaN or divergence
     if np.isnan(theta0) or np.isnan(theta1):
-        print(f"❌ Overflow detected at iteration {i}, reducing learning rate...")
+        print(f"Overflow at iteration {i}, reducing learning rate...")
         learning_rate /= 10  # Reduce learning rate
         theta0, theta1 = 0, 0  # Reset
         i = 0  # Restart training
@@ -51,7 +51,7 @@ with open("model.json", "w") as f:
     json.dump({"theta0": theta0, "theta1": theta1}, f)
     
 
-print(f"✅ Training complete: theta0 = {theta0}, theta1 = {theta1}")
+print(f"Training complete: theta0 = {theta0}, theta1 = {theta1}")
 
 # Plot Data
 plt.scatter(data["km"], data["price"], color="blue", label="Actual Data")
